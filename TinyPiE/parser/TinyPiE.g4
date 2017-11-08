@@ -19,7 +19,9 @@ unaryExpr: VALUE			# literalExpr
 
 ADDOP: '+'|'-';
 MULOP: '*'|'/';
+ANDOP: '&';
+OROP:  '|';
 
 IDENTIFIER: 'x'|'y'|'z';
-VALUE: [1-9][0-9]*|[0];
+VALUE: [1-9][0-9]*|'0';
 WS: [ \t\r\n] -> skip;

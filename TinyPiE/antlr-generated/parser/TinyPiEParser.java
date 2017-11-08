@@ -17,7 +17,8 @@ public class TinyPiEParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, ADDOP=3, MULOP=4, IDENTIFIER=5, VALUE=6, WS=7;
+		T__0=1, T__1=2, ADDOP=3, MULOP=4, ANDOP=5, OROP=6, IDENTIFIER=7, VALUE=8, 
+		WS=9;
 	public static final int
 		RULE_expr = 0, RULE_addExpr = 1, RULE_mulExpr = 2, RULE_unaryExpr = 3;
 	public static final String[] ruleNames = {
@@ -25,10 +26,11 @@ public class TinyPiEParser extends Parser {
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'('", "')'"
+		null, "'('", "')'", null, null, "'&'", "'|'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, "ADDOP", "MULOP", "IDENTIFIER", "VALUE", "WS"
+		null, null, null, "ADDOP", "MULOP", "ANDOP", "OROP", "IDENTIFIER", "VALUE", 
+		"WS"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -353,7 +355,7 @@ public class TinyPiEParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\t+\4\2\t\2\4\3\t"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\13+\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\7\3\23\n\3\f\3\16\3"+
 		"\26\13\3\3\4\3\4\3\4\3\4\3\4\3\4\7\4\36\n\4\f\4\16\4!\13\4\3\5\3\5\3\5"+
 		"\3\5\3\5\3\5\5\5)\n\5\3\5\2\4\4\6\6\2\4\6\b\2\2*\2\n\3\2\2\2\4\f\3\2\2"+
@@ -362,7 +364,7 @@ public class TinyPiEParser extends Parser {
 		"\3\2\2\2\23\26\3\2\2\2\24\22\3\2\2\2\24\25\3\2\2\2\25\5\3\2\2\2\26\24"+
 		"\3\2\2\2\27\30\b\4\1\2\30\31\5\b\5\2\31\37\3\2\2\2\32\33\f\4\2\2\33\34"+
 		"\7\6\2\2\34\36\5\b\5\2\35\32\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 \3\2"+
-		"\2\2 \7\3\2\2\2!\37\3\2\2\2\")\7\b\2\2#)\7\7\2\2$%\7\3\2\2%&\5\2\2\2&"+
+		"\2\2 \7\3\2\2\2!\37\3\2\2\2\")\7\n\2\2#)\7\t\2\2$%\7\3\2\2%&\5\2\2\2&"+
 		"\'\7\4\2\2\')\3\2\2\2(\"\3\2\2\2(#\3\2\2\2($\3\2\2\2)\t\3\2\2\2\5\24\37"+
 		"(";
 	public static final ATN _ATN =
