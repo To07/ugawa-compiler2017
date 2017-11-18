@@ -46,6 +46,9 @@ public class ASTGenerator {
 			/* addExpr -> addExpr + mulExpr */
 			ASTNode lhs = translateExpr(ctx.addExpr());
 			ASTNode rhs = translateExpr(ctx.mulExpr());
+			if (ctx.SUBOP() != null) {
+				return new ASTBinaryExprNode(ctx.SUBOP().getText(), lhs, rhs);
+			}
 			return new ASTBinaryExprNode(ctx.ADDOP().getText(), lhs, rhs);
 		/* mulExpr */
 		} else if (ctxx instanceof MulExprContext) {
@@ -61,7 +64,10 @@ public class ASTGenerator {
 		} else if (ctxx instanceof UnaryOpExprContext) {
 			UnaryOpExprContext ctx = (UnaryOpExprContext) ctxx;
 			ASTNode operand = translateExpr(ctx.unaryExpr());
-			return new ASTUnaryExprNode(ctx.UNARYOP().getText(), operand);
+			if (ctx.SUBOP() != null) {
+				return new ASTUnaryExprNode(ctx.SUBOP().getText(), operand);
+			}
+			return new ASTUnaryExprNode(ctx.NOTOP().getText(), operand);
 		/* literalExpr */
 		} else if (ctxx instanceof LiteralExprContext) {
 			LiteralExprContext ctx = (LiteralExprContext) ctxx;
