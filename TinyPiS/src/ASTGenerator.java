@@ -58,7 +58,7 @@ public class ASTGenerator {
 			ProgContext ctx = (ProgContext) ctxx;
 			ArrayList<String> varDecls = new ArrayList<String>();
 			for (TerminalNode id: ctx.varDecls().IDENTIFIER())
-				varDecls.add(id.toString());
+				varDecls.add(id.getText());
 			ASTNode stmt = translate(ctx.stmt());
 			return new ASTProgNode(varDecls, stmt);
 		/* CompoundStmtContext */
@@ -71,7 +71,7 @@ public class ASTGenerator {
 		/* AssignStmtContext */
 		} else if (ctxx instanceof AssignStmtContext) {
 			AssignStmtContext ctx = (AssignStmtContext) ctxx;
-			String var = ctx.IDENTIFIER().toString();
+			String var = ctx.IDENTIFIER().getText();
 			ASTNode expr = translate(ctx.expr());
 			return new ASTAssignStmtNode(var, expr);
 		/* IfStmtContext */
