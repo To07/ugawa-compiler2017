@@ -1,4 +1,4 @@
-// antlr4 -package parser -o antlr-generated  -no-listener parser/TinyPiE.g4
+// antlr4 -package parser -o antlr-generated  -no-listener parser/TinyPiS.g4
 grammar TinyPiS;
 
 prog: varDecls stmt
@@ -13,10 +13,18 @@ stmt: '{' stmt* '}'							# compoundStmt
 	| 'while' '(' expr ')' stmt				# whileStmt
 	;
 
-expr: addExpr
+expr: orExpr
     ;
+      
+orExpr: orExpr OROP andExpr
+	| andExpr
+	;
 
-addExpr: addExpr ADDOP mulExpr
+andExpr: andExpr ANDOP addExpr
+	| addExpr
+	;
+
+addExpr: addExpr (ADDOP|SUBOP) mulExpr
 	| mulExpr
 	;
 
@@ -24,14 +32,19 @@ mulExpr: mulExpr MULOP unaryExpr
 	| unaryExpr
 	;
 
-unaryExpr: VALUE			# literalExpr
-	| IDENTIFIER			# varExpr
-	| '(' expr ')'		# parenExpr
+unaryExpr: VALUE					# literalExpr
+	| IDENTIFIER					# varExpr
+	| '(' expr ')' 				# parenExpr
+	| (NOTOP|SUBOP) unaryExpr	# unaryOpExpr
 	;
 
-ADDOP: '+'|'-';
-MULOP: '*'|'/';
+ADDOP:   '+';
+SUBOP:	  '-';
+MULOP:   '*'|'/';
+ANDOP:   '&';
+OROP:    '|';
+NOTOP:   '~';
 
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-VALUE: [0-9]+;
+VALUE: [1-9][0-9]*|'0';
 WS: [ \t\r\n] -> skip;

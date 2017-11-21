@@ -1,0 +1,6 @@
+var and; var or;
+{
+  and = 5 & 6;
+  or  = 5 | 6;
+  answer = and + or
+}
