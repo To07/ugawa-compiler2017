@@ -1,0 +1,9 @@
+var _x; var answer_copy;
+{
+  _x = 15;
+  if (_x)
+    answer = _x;
+  else
+    answer = 128;
+  answer_copy = answer;
+}
