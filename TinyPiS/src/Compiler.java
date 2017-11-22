@@ -8,6 +8,7 @@ import parser.TinyPiSLexer;
 import parser.TinyPiSParser;
 
 public class Compiler extends CompilerBase {
+	boolean alreadyPrintAnswer = false;
 	void compileExpr(ASTNode ndx, Environment env) {
 		if (ndx instanceof ASTBinaryExprNode) {
 			ASTBinaryExprNode nd = (ASTBinaryExprNode) ndx;
@@ -105,6 +106,15 @@ public class Compiler extends CompilerBase {
 			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
 			compileExpr(nd.expr, env);
 			emitCALL("print_r0");
+			
+			System.out.println("\t@ EXITシステムコール");
+			emitRI("mov", "r7", 1);   // EXIT のシステムコール番号
+			emitRI("mov", "r0", 0);
+			emitI("swi", 0);
+			
+			printSubRoutine();
+			
+			alreadyPrintAnswer = true;
 		} else
 			throw new Error("Unknown expression: "+ndx);
 	}
@@ -132,13 +142,17 @@ public class Compiler extends CompilerBase {
 		System.out.println("_start:");
 		System.out.println("\t@ 式をコンパイルした命令列");
 		compileStmt(prog.stmt, env);
-		System.out.println("\t@ EXITシステムコール");
-		GlobalVariable v = (GlobalVariable) env.lookup("answer");
-		emitLDC(REG_DST, v.getLabel());  // 変数 answer の値を r0（終了コード）に入れる
-		emitLDR("r0", REG_DST, 0);
-		emitRI("mov", "r7", 1);   // EXIT のシステムコール番号
-		emitI("swi", 0);
+		
+		if (!alreadyPrintAnswer) {
+			System.out.println("\t@ EXITシステムコール");
+			GlobalVariable v = (GlobalVariable) env.lookup("answer");
+			emitLDC(REG_DST, v.getLabel());  // 変数 answer の値を r0（終了コード）に入れる
+			emitLDR("r0", REG_DST, 0);
+			emitRI("mov", "r7", 1);   // EXIT のシステムコール番号
+			emitI("swi", 0);
+		}
 	}
+	
 	/* 16進数で値をプリントするためのサブルーチン+αを書き込む */
 	void printSubRoutine() {
 		emitLabel("print_r0");
@@ -157,13 +171,20 @@ public class Compiler extends CompilerBase {
 		
 		/* PRINT */
 		emitLDC(REG_R1, "buf+8");
-		
-		
-		
-		
-		
-		
-		
+		emitRI("mov", "r4", 8);
+		emitRRI("add", "r2", "r1", 1);
+		emitLabel("loop0");
+		System.out.println("\tmov r6, r0, lsr #4");
+		System.out.println("\teor r7, r0, r6, lsl #4");
+		emitRI("cmp", "r7", 10);
+		emitRRI("addcc", "r7", "r7", 48);
+		emitRRI("addge", "r7", "r7", 55);
+		emitRR("mov", REG_DST, "r6");
+		System.out.println("\tstrb r7, [r1, #-1]!");
+		emitRRI("subs", "r4", "r4", 1);
+		emitJMP("bne", "loop0");
+		emitRRR("sub", "r2", "r2", "r1");
+		emitLabel("endloop");
 		
 		/*		上で書くPrint命令文
 		 *		（書いた）ldr	r1, =buf+8	@ 改行スペースのある位置
@@ -201,9 +222,9 @@ public class Compiler extends CompilerBase {
 		emitPOP(REG_DST);
 		
 		emitRET();
-		System.out.println("\t.section .text");
+		System.out.println("\t.section .data");
 		emitLabel("buf");
-		System.out.println("\t.space D");
+		System.out.println("\t.space 8");
 		System.out.println("\t.byte 10");
 	}
 

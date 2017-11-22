@@ -9,6 +9,7 @@ import parser.TinyPiSLexer;
 import parser.TinyPiSParser;
 
 public class Interpreter extends InterpreterBase {
+	boolean alreadyPrintAnswer = false;
 	int evalExpr(ASTNode ndx, Environment env) {
 		if (ndx instanceof ASTBinaryExprNode) {
 			ASTBinaryExprNode nd = (ASTBinaryExprNode) ndx;
@@ -78,6 +79,7 @@ public class Interpreter extends InterpreterBase {
 			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
 			int value = evalExpr(nd.expr, env);
 			System.out.println(String.format("%08X", value));
+			alreadyPrintAnswer = true;
 		} else
 			throw new Error("Unknown statement: "+ndx);
 	}
@@ -96,17 +98,23 @@ public class Interpreter extends InterpreterBase {
 		Variable varAnswer = env.lookup("answer");
 		return varAnswer.get();
 	}
+	
+	public void printAnswer(ASTNode ast) {
+		int answer = eval(ast);
+		if (!alreadyPrintAnswer) {
+			System.out.println(answer);
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
 		ANTLRInputStream input = new ANTLRInputStream(System.in);
 		TinyPiSLexer lexer = new TinyPiSLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
-        TinyPiSParser parser = new TinyPiSParser(token);
-        ParseTree tree = parser.prog();
-        ASTGenerator astgen = new ASTGenerator();
-        ASTNode ast = astgen.translate(tree);
-        Interpreter interp = new Interpreter();
-        int answer = interp.eval(ast);
-        System.out.println(answer);
+       TinyPiSParser parser = new TinyPiSParser(token);
+       ParseTree tree = parser.prog();
+       ASTGenerator astgen = new ASTGenerator();
+       ASTNode ast = astgen.translate(tree);
+       Interpreter interp = new Interpreter();
+       interp.printAnswer(ast);
 	}
 }
