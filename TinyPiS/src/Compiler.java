@@ -100,6 +100,11 @@ public class Compiler extends CompilerBase {
 			compileStmt(nd.stmt, env);
 			emitJMP("b", loopLabel);
 			emitLabel(endLabel);
+		} else if (ndx instanceof ASTPrintStmtNode) {
+			/* Print文 */
+			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
+			compileExpr(nd.expr, env);
+			emitCALL("print_r0");
 		} else
 			throw new Error("Unknown expression: "+ndx);
 	}
@@ -126,13 +131,80 @@ public class Compiler extends CompilerBase {
 		System.out.println("\t.global _start");
 		System.out.println("_start:");
 		System.out.println("\t@ 式をコンパイルした命令列");
-		compileExpr(ast, env);
+		compileStmt(prog.stmt, env);
 		System.out.println("\t@ EXITシステムコール");
 		GlobalVariable v = (GlobalVariable) env.lookup("answer");
 		emitLDC(REG_DST, v.getLabel());  // 変数 answer の値を r0（終了コード）に入れる
 		emitLDR("r0", REG_DST, 0);
 		emitRI("mov", "r7", 1);   // EXIT のシステムコール番号
 		emitI("swi", 0);
+	}
+	/* 16進数で値をプリントするためのサブルーチン+αを書き込む */
+	void printSubRoutine() {
+		emitLabel("print_r0");
+		
+		/* PUSH */
+		emitPUSH(REG_DST);
+		emitPUSH(REG_R1);
+		emitPUSH("r2");
+		emitPUSH("r3");
+		emitPUSH("r4");
+		emitPUSH("r5");
+		emitPUSH("r6");
+		emitPUSH("r7");
+		
+		emitLabel("print");
+		
+		/* PRINT */
+		emitLDC(REG_R1, "buf+8");
+		
+		
+		
+		
+		
+		
+		
+		
+		/*		上で書くPrint命令文
+		 *		（書いた）ldr	r1, =buf+8	@ 改行スペースのある位置
+		 *		mov	r4, #8
+		 *		add	r2, r1, #1	@ 文字列の長さ
+		 *	loop0:
+		 *		mov	r6, r0, lsr #4
+		 *		eor	r7, r0, r6,lsl #4 
+		 *		cmp	r7 ,#10
+		 *		addcc	r7 ,r7,#48	@ +'0'
+		 *		addge	r7, r7,#87	@ -10 + 'a'
+		 *		mov	r0, r6		@ div16した後の値
+		 *	
+		 *		strb	r7, [r1, #-1]!	@ 値の格納
+		 *		subs	r4, r4, #1	
+		 *		bne	loop0
+		 *		sub	r2, r2, r1
+		 *		
+		 *	endloop:	
+		 */
+		
+		/* WRITE */
+		emitRI("mov", "r7", 4);   // WRITE のシステムコール番号
+		emitRI("mov", "r0", 1);   // 標準出力
+		emitI("swi", 0);
+		
+		/* POP */
+		emitPOP("r7");
+		emitPOP("r6");
+		emitPOP("r5");
+		emitPOP("r4");
+		emitPOP("r3");
+		emitPOP("r2");
+		emitPOP(REG_R1);
+		emitPOP(REG_DST);
+		
+		emitRET();
+		System.out.println("\t.section .text");
+		emitLabel("buf");
+		System.out.println("\t.space D");
+		System.out.println("\t.byte 10");
 	}
 
 	public static void main(String[] args) throws IOException {
