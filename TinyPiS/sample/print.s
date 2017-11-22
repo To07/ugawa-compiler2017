@@ -29,22 +29,20 @@ print_r0:
 	str r2, [sp, #-4]!
 	str r3, [sp, #-4]!
 	str r4, [sp, #-4]!
-	str r5, [sp, #-4]!
-	str r6, [sp, #-4]!
 	str r7, [sp, #-4]!
 print:
 	ldr r1, =buf+8
-	mov r4, #8
+	mov r3, #8
 	add r2, r1, #1
 loop0:
-	mov r6, r0, lsr #4
-	eor r7, r0, r6, lsl #4
+	mov r4, r0, lsr #4
+	eor r7, r0, r4, lsl #4
 	cmp r7, #10
 	addcc r7, r7, #48
 	addge r7, r7, #55
-	mov r0, r6
+	mov r0, r4
 	strb r7, [r1, #-1]!
-	subs r4, r4, #1
+	subs r3, r3, #1
 	bne loop0
 	sub r2, r2, r1
 endloop:
@@ -52,8 +50,6 @@ endloop:
 	mov r0, #1
 	swi #0
 	ldr r7, [sp], #4
-	ldr r6, [sp], #4
-	ldr r5, [sp], #4
 	ldr r4, [sp], #4
 	ldr r3, [sp], #4
 	ldr r2, [sp], #4

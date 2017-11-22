@@ -163,48 +163,26 @@ public class Compiler extends CompilerBase {
 		emitPUSH("r2");
 		emitPUSH("r3");
 		emitPUSH("r4");
-		emitPUSH("r5");
-		emitPUSH("r6");
 		emitPUSH("r7");
 		
 		emitLabel("print");
 		
 		/* PRINT */
 		emitLDC(REG_R1, "buf+8");
-		emitRI("mov", "r4", 8);
+		emitRI("mov", "r3", 8);
 		emitRRI("add", "r2", "r1", 1);
 		emitLabel("loop0");
-		System.out.println("\tmov r6, r0, lsr #4");
-		System.out.println("\teor r7, r0, r6, lsl #4");
+		System.out.println("\tmov r4, r0, lsr #4");
+		System.out.println("\teor r7, r0, r4, lsl #4");
 		emitRI("cmp", "r7", 10);
 		emitRRI("addcc", "r7", "r7", 48);
 		emitRRI("addge", "r7", "r7", 55);
-		emitRR("mov", REG_DST, "r6");
+		emitRR("mov", REG_DST, "r4");
 		System.out.println("\tstrb r7, [r1, #-1]!");
-		emitRRI("subs", "r4", "r4", 1);
+		emitRRI("subs", "r3", "r3", 1);
 		emitJMP("bne", "loop0");
 		emitRRR("sub", "r2", "r2", "r1");
 		emitLabel("endloop");
-		
-		/*		上で書くPrint命令文
-		 *		（書いた）ldr	r1, =buf+8	@ 改行スペースのある位置
-		 *		mov	r4, #8
-		 *		add	r2, r1, #1	@ 文字列の長さ
-		 *	loop0:
-		 *		mov	r6, r0, lsr #4
-		 *		eor	r7, r0, r6,lsl #4 
-		 *		cmp	r7 ,#10
-		 *		addcc	r7 ,r7,#48	@ +'0'
-		 *		addge	r7, r7,#87	@ -10 + 'a'
-		 *		mov	r0, r6		@ div16した後の値
-		 *	
-		 *		strb	r7, [r1, #-1]!	@ 値の格納
-		 *		subs	r4, r4, #1	
-		 *		bne	loop0
-		 *		sub	r2, r2, r1
-		 *		
-		 *	endloop:	
-		 */
 		
 		/* WRITE */
 		emitRI("mov", "r7", 4);   // WRITE のシステムコール番号
@@ -213,8 +191,6 @@ public class Compiler extends CompilerBase {
 		
 		/* POP */
 		emitPOP("r7");
-		emitPOP("r6");
-		emitPOP("r5");
 		emitPOP("r4");
 		emitPOP("r3");
 		emitPOP("r2");
