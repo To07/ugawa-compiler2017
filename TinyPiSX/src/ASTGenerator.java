@@ -12,6 +12,8 @@ import parser.TinyPiSXParser.CompoundStmtContext;
 import parser.TinyPiSXParser.ExprContext;
 import parser.TinyPiSXParser.IfStmtContext;
 import parser.TinyPiSXParser.LiteralExprContext;
+import parser.TinyPiSXParser.LogAndExprContext;
+import parser.TinyPiSXParser.LogOrExprContext;
 import parser.TinyPiSXParser.MulExprContext;
 import parser.TinyPiSXParser.OrExprContext;
 import parser.TinyPiSXParser.ParenExprContext;
@@ -27,7 +29,23 @@ public class ASTGenerator {
 		/* ExprContext */
 		if (ctxx instanceof ExprContext) {
 			ExprContext ctx = (ExprContext) ctxx;
-			return translate(ctx.orExpr());
+			return translate(ctx.logOrExpr());
+		/* LogOrExprContext */
+		} else if (ctxx instanceof LogOrExprContext) {
+			LogOrExprContext ctx = (LogOrExprContext) ctxx;
+			if (ctx.logOrExpr() == null)
+				return translate(ctx.logAndExpr());
+			ASTNode lhs = translate(ctx.logOrExpr());
+			ASTNode rhs = translate(ctx.logAndExpr());
+			return new ASTBinaryExprNode(ctx.LOROP().getText(), lhs, rhs);
+		/* LogAndExprContext */
+		} else if (ctxx instanceof LogAndExprContext) {
+			LogAndExprContext ctx = (LogAndExprContext) ctxx;
+			if (ctx.logAndExpr() == null)
+				return translate(ctx.orExpr());
+			ASTNode lhs = translate(ctx.logAndExpr());
+			ASTNode rhs = translate(ctx.orExpr());
+			return new ASTBinaryExprNode(ctx.LANDOP().getText(), lhs, rhs);
 		/* OrExprContext */
 		} else if (ctxx instanceof OrExprContext) {
 			OrExprContext ctx = (OrExprContext) ctxx;

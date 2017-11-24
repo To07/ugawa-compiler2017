@@ -1,9 +1,0 @@
-var not; var minus;
-{
-  not = ~5;
-  minus = -5;
-  if (not-minus+1)
-    answer = 1;
-  else
-    answer = 5;
-}

@@ -14,9 +14,17 @@ stmt: '{' stmt* '}'							# compoundStmt
 	| 'print' expr ';'						# printStmt
 	;
 
-expr: orExpr
+expr: logOrExpr
     ;
-      
+     
+logOrExpr: logOrExpr LOROP logAndExpr
+	| logAndExpr
+	;
+
+logAndExpr: logAndExpr LANDOP orExpr
+	| orExpr
+	;
+ 
 orExpr: orExpr OROP andExpr
 	| andExpr
 	;
@@ -52,7 +60,9 @@ SUBOP:	  '-';
 MULOP:   '*'|'/';
 ANDOP:   '&';
 OROP:    '|';
-NOTOP:   '~';
+NOTOP:   '~'|'!';
+LANDOP:  '&&';
+LOROP:	  '||';
 CMP1OP:  '=='|'!=';
 CMP2OP:  '>'|'<'|'>='|'<=';
 

@@ -1,8 +1,0 @@
-var x;
-{
-  x = 0;
-  answer = 5;
-  while (x) {
-    answer = 10;
-  }
-}

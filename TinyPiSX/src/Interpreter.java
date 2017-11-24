@@ -39,6 +39,10 @@ public class Interpreter extends InterpreterBase {
 				return (lhsValue >= rhsValue) ? 1 : 0;
 			else if (nd.op.equals("<="))
 				return (lhsValue <= rhsValue) ? 1 : 0;
+			else if (nd.op.equals("&&"))
+				return (lhsValue != 0 && rhsValue != 0) ? 1 : 0;
+			else if (nd.op.equals("||"))
+				return (lhsValue != 0 || rhsValue != 0) ? 1 : 0;
 			else
 				throw new Error("Unknwon operator: "+nd.op);
 		} else if (ndx instanceof ASTUnaryExprNode) {
@@ -48,6 +52,8 @@ public class Interpreter extends InterpreterBase {
 				return -operand;
 			else if (nd.op.equals("~"))
 				return ~operand;
+			else if (nd.op.equals("!"))
+				return (operand == 0) ? 1 : 0;
 			else
 				throw new Error("Unknown operator: "+nd.op);
 		} else if (ndx instanceof ASTNumberNode) {
