@@ -3,22 +3,24 @@ import java.util.ArrayList;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import parser.TinyPiSParser.AddExprContext;
-import parser.TinyPiSParser.AndExprContext;
-import parser.TinyPiSParser.AssignStmtContext;
-import parser.TinyPiSParser.CompoundStmtContext;
-import parser.TinyPiSParser.ExprContext;
-import parser.TinyPiSParser.IfStmtContext;
-import parser.TinyPiSParser.LiteralExprContext;
-import parser.TinyPiSParser.MulExprContext;
-import parser.TinyPiSParser.OrExprContext;
-import parser.TinyPiSParser.ParenExprContext;
-import parser.TinyPiSParser.PrintStmtContext;
-import parser.TinyPiSParser.ProgContext;
-import parser.TinyPiSParser.StmtContext;
-import parser.TinyPiSParser.UnaryOpExprContext;
-import parser.TinyPiSParser.VarExprContext;
-import parser.TinyPiSParser.WhileStmtContext;
+import parser.TinyPiSXParser.AddExprContext;
+import parser.TinyPiSXParser.AndExprContext;
+import parser.TinyPiSXParser.AssignStmtContext;
+import parser.TinyPiSXParser.Cmp1ExprContext;
+import parser.TinyPiSXParser.Cmp2ExprContext;
+import parser.TinyPiSXParser.CompoundStmtContext;
+import parser.TinyPiSXParser.ExprContext;
+import parser.TinyPiSXParser.IfStmtContext;
+import parser.TinyPiSXParser.LiteralExprContext;
+import parser.TinyPiSXParser.MulExprContext;
+import parser.TinyPiSXParser.OrExprContext;
+import parser.TinyPiSXParser.ParenExprContext;
+import parser.TinyPiSXParser.PrintStmtContext;
+import parser.TinyPiSXParser.ProgContext;
+import parser.TinyPiSXParser.StmtContext;
+import parser.TinyPiSXParser.UnaryOpExprContext;
+import parser.TinyPiSXParser.VarExprContext;
+import parser.TinyPiSXParser.WhileStmtContext;
 
 public class ASTGenerator {	
 	ASTNode translate(ParseTree ctxx) {
@@ -29,23 +31,35 @@ public class ASTGenerator {
 		/* OrExprContext */
 		} else if (ctxx instanceof OrExprContext) {
 			OrExprContext ctx = (OrExprContext) ctxx;
-			/* orExpr -> andExpr */
 			if (ctx.orExpr() == null)
 				return translate(ctx.andExpr());
-			/* addExpr -> addExpr | mulExpr */
 			ASTNode lhs = translate(ctx.orExpr());
 			ASTNode rhs = translate(ctx.andExpr());
 			return new ASTBinaryExprNode(ctx.OROP().getText(), lhs, rhs);
 		/* AndExprContext */
 		} else if (ctxx instanceof AndExprContext) {
 			AndExprContext ctx = (AndExprContext) ctxx;
-			/* andExpr -> addExpr */
 			if (ctx.andExpr() == null)
-				return translate(ctx.addExpr());
-			/* andExpr -> andExpr & addExpr */
+				return translate(ctx.cmp1Expr());
 			ASTNode lhs = translate(ctx.andExpr());
-			ASTNode rhs = translate(ctx.addExpr());
+			ASTNode rhs = translate(ctx.cmp1Expr());
 			return new ASTBinaryExprNode(ctx.ANDOP().getText(), lhs, rhs);
+		/* Cmp1ExprContext */
+		} else if (ctxx instanceof Cmp1ExprContext) {
+			Cmp1ExprContext ctx = (Cmp1ExprContext) ctxx;
+			if (ctx.cmp1Expr() == null)
+				return translate(ctx.cmp2Expr());
+			ASTNode lhs = translate(ctx.cmp1Expr());
+			ASTNode rhs = translate(ctx.cmp2Expr());
+			return new ASTBinaryExprNode(ctx.CMP1OP().getText(), lhs, rhs);
+		/* Cmp2ExprContext */
+		} else if (ctxx instanceof Cmp2ExprContext) {
+			Cmp2ExprContext ctx = (Cmp2ExprContext) ctxx;
+			if (ctx.cmp2Expr() == null)
+				return translate(ctx.addExpr());
+			ASTNode lhs = translate(ctx.cmp2Expr());
+			ASTNode rhs = translate(ctx.addExpr());
+			return new ASTBinaryExprNode(ctx.CMP2OP().getText(), lhs, rhs);
 		/* AddExprContext */
 		} else if (ctxx instanceof AddExprContext) {
 			AddExprContext ctx = (AddExprContext) ctxx;

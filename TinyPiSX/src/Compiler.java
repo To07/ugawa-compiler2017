@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import parser.TinyPiSLexer;
-import parser.TinyPiSParser;
+import parser.TinyPiSXLexer;
+import parser.TinyPiSXParser;
 
 public class Compiler extends CompilerBase {
 	boolean alreadyPrintAnswer = false;
@@ -28,6 +28,31 @@ public class Compiler extends CompilerBase {
 				emitRRR("and", REG_DST, REG_R1, REG_DST);
 			else if (nd.op.equals("|"))
 				emitRRR("orr", REG_DST, REG_R1, REG_DST);
+			else if (nd.op.equals("==")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("moveq", REG_DST, 1);
+				emitRI("movne", REG_DST, 0);
+			} else if (nd.op.equals("!=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movne", REG_DST, 1);
+				emitRI("moveq", REG_DST, 0);
+			} else if (nd.op.equals(">")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movgt", REG_DST, 1);
+				emitRI("movls", REG_DST, 0);
+			} else if (nd.op.equals("<")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movlt", REG_DST, 1);
+				emitRI("movge", REG_DST, 0);
+			} else if (nd.op.equals(">=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movge", REG_DST, 1);
+				emitRI("movlt", REG_DST, 0);
+			} else if (nd.op.equals("<=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movls", REG_DST, 1);
+				emitRI("movgt", REG_DST, 0);
+			}
 			else
 				throw new Error("Unknwon operator: "+nd.op);
 			emitPOP(REG_R1);
@@ -103,16 +128,17 @@ public class Compiler extends CompilerBase {
 			emitLabel(endLabel);
 		} else if (ndx instanceof ASTPrintStmtNode) {
 			/* Print文 */
+			String print_r0 = freshLabel();
 			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
 			compileExpr(nd.expr, env);
-			emitCALL("print_r0");
+			emitCALL(print_r0);
 			
 			System.out.println("\t@ EXITシステムコール");
 			emitRI("mov", "r7", 1);   // EXIT のシステムコール番号
 			emitRI("mov", "r0", 0);
 			emitI("swi", 0);
 			
-			printSubRoutine();
+			printSubRoutine(print_r0);
 			
 			alreadyPrintAnswer = true;
 		} else
@@ -154,8 +180,12 @@ public class Compiler extends CompilerBase {
 	}
 	
 	/* 16進数で値をプリントするためのサブルーチン+αを書き込む */
-	void printSubRoutine() {
-		emitLabel("print_r0");
+	void printSubRoutine(String print_r0) {
+		String print = freshLabel();
+		String loop0 = freshLabel();
+		String endloop = freshLabel();
+		
+		emitLabel(print_r0);
 		
 		/* PUSH */
 		emitPUSH(REG_DST);
@@ -165,13 +195,13 @@ public class Compiler extends CompilerBase {
 		emitPUSH("r4");
 		emitPUSH("r7");
 		
-		emitLabel("print");
+		emitLabel(print);
 		
 		/* PRINT */
 		emitLDC(REG_R1, "buf+8");
 		emitRI("mov", "r3", 8);
 		emitRRI("add", "r2", "r1", 1);
-		emitLabel("loop0");
+		emitLabel(loop0);
 		System.out.println("\tmov r4, r0, lsr #4");
 		System.out.println("\teor r7, r0, r4, lsl #4");
 		emitRI("cmp", "r7", 10);
@@ -180,9 +210,9 @@ public class Compiler extends CompilerBase {
 		emitRR("mov", REG_DST, "r4");
 		System.out.println("\tstrb r7, [r1, #-1]!");
 		emitRRI("subs", "r3", "r3", 1);
-		emitJMP("bne", "loop0");
+		emitJMP("bne", loop0);
 		emitRRR("sub", "r2", "r2", "r1");
-		emitLabel("endloop");
+		emitLabel(endloop);
 		
 		/* WRITE */
 		emitRI("mov", "r7", 4);   // WRITE のシステムコール番号
@@ -206,9 +236,9 @@ public class Compiler extends CompilerBase {
 
 	public static void main(String[] args) throws IOException {
 		ANTLRInputStream input = new ANTLRInputStream(System.in);
-		TinyPiSLexer lexer = new TinyPiSLexer(input);
+		TinyPiSXLexer lexer = new TinyPiSXLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
-		TinyPiSParser parser = new TinyPiSParser(token);
+		TinyPiSXParser parser = new TinyPiSXParser(token);
 		ParseTree tree = parser.prog();
 		ASTGenerator astgen = new ASTGenerator();
 		ASTNode ast = astgen.translate(tree);

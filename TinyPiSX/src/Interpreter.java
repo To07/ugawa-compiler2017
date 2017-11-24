@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import parser.TinyPiSLexer;
-import parser.TinyPiSParser;
+import parser.TinyPiSXLexer;
+import parser.TinyPiSXParser;
 
 public class Interpreter extends InterpreterBase {
 	boolean alreadyPrintAnswer = false;
@@ -27,6 +27,18 @@ public class Interpreter extends InterpreterBase {
 				return lhsValue & rhsValue;
 			else if (nd.op.equals("|"))
 				return lhsValue | rhsValue;
+			else if (nd.op.equals("=="))
+				return (lhsValue == rhsValue) ? 1 : 0;
+			else if (nd.op.equals("!="))
+				return (lhsValue != rhsValue) ? 1 : 0;
+			else if (nd.op.equals(">"))
+				return (lhsValue > rhsValue) ? 1 : 0;
+			else if (nd.op.equals("<"))
+				return (lhsValue < rhsValue) ? 1 : 0;
+			else if (nd.op.equals(">="))
+				return (lhsValue >= rhsValue) ? 1 : 0;
+			else if (nd.op.equals("<="))
+				return (lhsValue <= rhsValue) ? 1 : 0;
 			else
 				throw new Error("Unknwon operator: "+nd.op);
 		} else if (ndx instanceof ASTUnaryExprNode) {
@@ -108,9 +120,9 @@ public class Interpreter extends InterpreterBase {
 
 	public static void main(String[] args) throws IOException {
 		ANTLRInputStream input = new ANTLRInputStream(System.in);
-		TinyPiSLexer lexer = new TinyPiSLexer(input);
+		TinyPiSXLexer lexer = new TinyPiSXLexer(input);
 		CommonTokenStream token = new CommonTokenStream(lexer);
-       TinyPiSParser parser = new TinyPiSParser(token);
+       TinyPiSXParser parser = new TinyPiSXParser(token);
        ParseTree tree = parser.prog();
        ASTGenerator astgen = new ASTGenerator();
        ASTNode ast = astgen.translate(tree);

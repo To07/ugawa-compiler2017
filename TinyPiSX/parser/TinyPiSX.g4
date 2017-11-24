@@ -1,5 +1,5 @@
-// antlr4 -package parser -o antlr-generated  -no-listener parser/TinyPiS.g4
-grammar TinyPiS;
+// antlr4 -package parser -o antlr-generated  -no-listener parser/TinyPiSX.g4
+grammar TinyPiSX;
 
 prog: varDecls stmt
 	;
@@ -21,7 +21,15 @@ orExpr: orExpr OROP andExpr
 	| andExpr
 	;
 
-andExpr: andExpr ANDOP addExpr
+andExpr: andExpr ANDOP cmp1Expr
+	| cmp1Expr
+	;
+	
+cmp1Expr: cmp1Expr CMP1OP cmp2Expr
+	| cmp2Expr
+	;
+
+cmp2Expr: cmp2Expr CMP2OP addExpr
 	| addExpr
 	;
 
@@ -45,6 +53,8 @@ MULOP:   '*'|'/';
 ANDOP:   '&';
 OROP:    '|';
 NOTOP:   '~';
+CMP1OP:  '=='|'!=';
+CMP2OP:  '>'|'<'|'>='|'<=';
 
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 VALUE: [1-9][0-9]*|'0';
