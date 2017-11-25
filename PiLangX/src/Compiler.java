@@ -163,6 +163,16 @@ public class Compiler extends CompilerBase {
 				emitRR("cmp", REG_R1, REG_DST);
 				emitRI("movls", REG_DST, 1);
 				emitRI("movgt", REG_DST, 0);
+			} else if (nd.op.equals("&&")) {
+				emitRI("cmp", REG_R1, 0);
+				emitRI("cmpne", REG_DST, 0);
+				emitRI("movne", REG_DST, 1);
+				emitRI("moveq", REG_DST, 0);
+			} else if (nd.op.equals("||")) {
+				emitRI("cmp", REG_R1, 0);
+				emitRI("cmpeq", REG_DST, 0);
+				emitRI("movne", REG_DST, 1);
+				emitRI("moveq", REG_DST, 0);
 			}
 			else
 				throw new Error("Unknwon operator: "+nd.op);
@@ -175,6 +185,11 @@ public class Compiler extends CompilerBase {
 				emitRRI("add", REG_DST, REG_DST, 1);
 			} else if (nd.op.equals("~"))
 				emitRR("mvn", REG_DST, REG_DST);
+			else if (nd.op.equals("!")) {
+				emitRI("cmp", REG_DST, 0);
+				emitRI("moveq", REG_DST, 1);
+				emitRI("movne", REG_DST, 0);
+			}
 			else
 				throw new Error("Unkown operator: "+nd.op);
 		} else if (ndx instanceof ASTNumberNode) {
