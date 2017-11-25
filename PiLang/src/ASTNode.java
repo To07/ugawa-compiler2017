@@ -143,9 +143,9 @@ class ASTVarRefNode extends ASTNode {
 	}
 }
 
-class ASTReturnNode extends ASTNode {
+class ASTReturnStmtNode extends ASTNode {
 	ASTNode expr;
-	ASTReturnNode(ASTNode expr) {
+	ASTReturnStmtNode(ASTNode expr) {
 		this.expr = expr;
 	}
 	@Override
