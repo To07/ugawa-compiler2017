@@ -10,6 +10,7 @@ import parser.PiLangLexer;
 import parser.PiLangParser;
 
 public class Compiler extends CompilerBase {
+	boolean alreadyPrintAnswer = false;
 	Environment globalEnv;
 	
 	void compileFunction(ASTFunctionNode nd) {
@@ -107,6 +108,13 @@ public class Compiler extends CompilerBase {
 			/* 関数を呼ぶ */
 			compileExpr(nd.expr, env);
 			emitJMP("b", epLabel);
+		} else if (ndx instanceof ASTPrintStmtNode) {
+			/* Print文 */
+			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
+			compileExpr(nd.expr, env);
+			emitCALL("print_r0");
+			
+			alreadyPrintAnswer = true;
 		} else
 			throw new Error("Unknown expression: "+ndx);
 	}
@@ -196,6 +204,7 @@ public class Compiler extends CompilerBase {
 		System.out.println("_start:");
 		System.out.println("\t@ main関数を呼出す．戻り値は r0 に入る");
 		emitJMP("bl", "main");
+		
 		System.out.println("\t@ EXITシステムコール");
 		emitRI("mov", "r7", 1);      // EXIT のシステムコール番号
 		emitI("swi", 0);
@@ -203,6 +212,60 @@ public class Compiler extends CompilerBase {
 		/* 関数定義 */
 		for (ASTFunctionNode func: program.funcDecls)
 			compileFunction(func);
+		
+		if (alreadyPrintAnswer)
+			printSubRoutine();
+	}
+	
+	/* 16進数で値をプリントするためのサブルーチン+αを書き込む */
+	void printSubRoutine() {
+		emitLabel("print_r0");
+		
+		/* PUSH */
+		emitPUSH(REG_DST);
+		emitPUSH(REG_R1);
+		emitPUSH("r2");
+		emitPUSH("r3");
+		emitPUSH("r4");
+		emitPUSH("r7");
+		
+		emitLabel("print");
+		
+		/* PRINT */
+		emitLDC(REG_R1, "buf+8");
+		emitRI("mov", "r3", 8);
+		emitRRI("add", "r2", "r1", 1);
+		emitLabel("loop0");
+		System.out.println("\tmov r4, r0, lsr #4");
+		System.out.println("\teor r7, r0, r4, lsl #4");
+		emitRI("cmp", "r7", 10);
+		emitRRI("addcc", "r7", "r7", 48);
+		emitRRI("addge", "r7", "r7", 55);
+		emitRR("mov", REG_DST, "r4");
+		System.out.println("\tstrb r7, [r1, #-1]!");
+		emitRRI("subs", "r3", "r3", 1);
+		emitJMP("bne", "loop0");
+		emitRRR("sub", "r2", "r2", "r1");
+		emitLabel("endloop");
+		
+		/* WRITE */
+		emitRI("mov", "r7", 4);   // WRITE のシステムコール番号
+		emitRI("mov", "r0", 1);   // 標準出力
+		emitI("swi", 0);
+		
+		/* POP */
+		emitPOP("r7");
+		emitPOP("r4");
+		emitPOP("r3");
+		emitPOP("r2");
+		emitPOP(REG_R1);
+		emitPOP(REG_DST);
+		
+		emitRET();
+		System.out.println("\t.section .data");
+		emitLabel("buf");
+		System.out.println("\t.space 8");
+		System.out.println("\t.byte 10");
 	}
 
 	public static void main(String[] args) throws IOException {

@@ -94,6 +94,11 @@ public class Interpreter extends InterpreterBase {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;
 			int value = evalExpr(nd.expr, env);
 			return new ReturnValue(value);
+		} else if (ndx instanceof ASTPrintStmtNode) {
+			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
+			int value = evalExpr(nd.expr, env);
+			System.out.println(String.format("%08X", value));
+			return null;
 		} else
 			throw new Error("Unknown statement: "+ndx);
 	}
