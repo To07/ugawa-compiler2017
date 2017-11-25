@@ -139,6 +139,31 @@ public class Compiler extends CompilerBase {
 				emitRRR("and", REG_DST, REG_R1, REG_DST);
 			else if (nd.op.equals("|"))
 				emitRRR("orr", REG_DST, REG_R1, REG_DST);
+			else if (nd.op.equals("==")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("moveq", REG_DST, 1);
+				emitRI("movne", REG_DST, 0);
+			} else if (nd.op.equals("!=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movne", REG_DST, 1);
+				emitRI("moveq", REG_DST, 0);
+			} else if (nd.op.equals(">")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movgt", REG_DST, 1);
+				emitRI("movls", REG_DST, 0);
+			} else if (nd.op.equals("<")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movlt", REG_DST, 1);
+				emitRI("movge", REG_DST, 0);
+			} else if (nd.op.equals(">=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movge", REG_DST, 1);
+				emitRI("movlt", REG_DST, 0);
+			} else if (nd.op.equals("<=")) {
+				emitRR("cmp", REG_R1, REG_DST);
+				emitRI("movls", REG_DST, 1);
+				emitRI("movgt", REG_DST, 0);
+			}
 			else
 				throw new Error("Unknwon operator: "+nd.op);
 			emitPOP(REG_R1);

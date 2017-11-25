@@ -121,6 +121,18 @@ public class Interpreter extends InterpreterBase {
 				return lhsValue & rhsValue;
 			else if (nd.op.equals("|"))
 				return lhsValue | rhsValue;
+			else if (nd.op.equals("=="))
+				return (lhsValue == rhsValue) ? 1 : 0;
+			else if (nd.op.equals("!="))
+				return (lhsValue != rhsValue) ? 1 : 0;
+			else if (nd.op.equals(">"))
+				return (lhsValue > rhsValue) ? 1 : 0;
+			else if (nd.op.equals("<"))
+				return (lhsValue < rhsValue) ? 1 : 0;
+			else if (nd.op.equals(">="))
+				return (lhsValue >= rhsValue) ? 1 : 0;
+			else if (nd.op.equals("<="))
+				return (lhsValue <= rhsValue) ? 1 : 0;
 			else
 				throw new Error("Unknwon operator: "+nd.op);
 		} else if (ndx instanceof ASTUnaryExprNode) {
