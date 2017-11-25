@@ -143,6 +143,17 @@ class ASTVarRefNode extends ASTNode {
 	}
 }
 
+class ASTReturnNode extends ASTNode {
+	ASTNode expr;
+	ASTReturnNode(ASTNode expr) {
+		this.expr = expr;
+	}
+	@Override
+	public String toString() {
+		return "(ReturnStmt "+expr+")";
+	}
+}
+
 class ASTCallNode extends ASTNode {
 	String name;
 	ArrayList<ASTNode> args;
