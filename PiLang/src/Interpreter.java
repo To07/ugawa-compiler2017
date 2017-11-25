@@ -34,7 +34,6 @@ public class Interpreter extends InterpreterBase {
 			var.set(arg);
 			env.push(var);
 		}
-
 		/* ローカル変数を追加するコードをここに書く */
 		for (int i = 0; i < nd.varDecls.size(); i++) {
 			String name = nd.varDecls.get(i);
@@ -42,7 +41,6 @@ public class Interpreter extends InterpreterBase {
 			var.set(0);
 			env.push(var);
 		}
-
 		for (ASTNode stmt: nd.stmts) {
 			ReturnValue retval = evalStmt(stmt, env);
 			if (retval != null)
@@ -56,8 +54,11 @@ public class Interpreter extends InterpreterBase {
 		if (ndx instanceof ASTCompoundStmtNode) {
 			ASTCompoundStmtNode nd = (ASTCompoundStmtNode) ndx;
 			ArrayList<ASTNode> stmts = nd.stmts;
-			for (ASTNode child: stmts)
-				evalStmt(child, env);
+			for (ASTNode child: stmts) {
+				ReturnValue retval = evalStmt(child, env);
+				if (retval != null)
+					return retval;
+			}
 			return null;
 		} else if (ndx instanceof ASTAssignStmtNode) {
 			ASTAssignStmtNode nd = (ASTAssignStmtNode) ndx;
@@ -71,15 +72,23 @@ public class Interpreter extends InterpreterBase {
 			return null;
 		} else if (ndx instanceof ASTIfStmtNode) {
 			ASTIfStmtNode nd = (ASTIfStmtNode) ndx;
-			if (evalExpr(nd.cond, env) != 0)
-				evalStmt(nd.thenClause, env);
-			else
-				evalStmt(nd.elseClause, env);
+			if (evalExpr(nd.cond, env) != 0) {
+				ReturnValue retval = evalStmt(nd.thenClause, env);
+				if (retval != null)
+					return retval;
+			} else {
+				ReturnValue retval = evalStmt(nd.elseClause, env);
+				if (retval != null)
+					return retval;
+			}
 			return null;
 		} else if (ndx instanceof ASTWhileStmtNode) {
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
-			while (evalExpr(nd.cond, env) != 0)
-				evalStmt(nd.stmt, env);
+			while (evalExpr(nd.cond, env) != 0) {
+				ReturnValue retval = evalStmt(nd.stmt, env);
+				if (retval != null)
+					return retval;
+			}
 			return null;
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;
