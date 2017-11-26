@@ -1,8 +1,0 @@
-function main() {
-  var x;
-  x = 6;
-  if (x > 5)
-    return x;
-  else
-    return 255;
-}
