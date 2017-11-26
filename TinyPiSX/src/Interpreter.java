@@ -91,7 +91,7 @@ public class Interpreter extends InterpreterBase {
 				evalStmt(nd.elseClause, env);
 		} else if (ndx instanceof ASTWhileStmtNode) {
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
-			while (evalExpr(nd.cond, env) != 1)
+			while (evalExpr(nd.cond, env) != 0)
 				evalStmt(nd.stmt, env);
 		} else if (ndx instanceof ASTPrintStmtNode) {
 			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
