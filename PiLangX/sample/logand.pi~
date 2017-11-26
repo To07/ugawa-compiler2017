@@ -1,0 +1,7 @@
+function main() {
+  var x;
+  if (x == 5 && x == 6)
+    return x;
+  else
+    return 255;
+}

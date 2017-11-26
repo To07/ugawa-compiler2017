@@ -37,6 +37,11 @@ public class Compiler extends CompilerBase {
 		emitPUSH(REG_LR);
 		emitPUSH(REG_R1);
 		emitRRI("sub", REG_SP, REG_SP, nd.varDecls.size() * 4);
+		for (int i = 0; i < nd.varDecls.size(); i++) {
+			int offset = -4 * (i + 3);
+			emitLDC(REG_DST, 0);
+			System.out.println("\tstr "+REG_DST+", ["+REG_FP+", #"+offset+"]");
+		}
 		for (ASTNode stmt: nd.stmts)
 			compileStmt(stmt, epilogueLabel, env);
 		emitRI("mov", REG_DST, 0);  // returnがなかったときの戻り値 0
