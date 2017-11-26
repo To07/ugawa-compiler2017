@@ -16,6 +16,7 @@ public class Interpreter extends InterpreterBase {
 		int value;
 	}
 	
+	boolean breakStmtExecute = false;
 	Environment globalEnv;
 	ASTProgNode prog;
 	ASTFunctionNode lookupFunction(String name) {
@@ -34,7 +35,7 @@ public class Interpreter extends InterpreterBase {
 			var.set(arg);
 			env.push(var);
 		}
-		/* ローカル変数を追加するコードをここに書く */
+		/* ローカル変数を追加する */
 		for (int i = 0; i < nd.varDecls.size(); i++) {
 			String name = nd.varDecls.get(i);
 			Variable var = new Variable(name);
@@ -50,7 +51,9 @@ public class Interpreter extends InterpreterBase {
 	}
 
 	ReturnValue evalStmt(ASTNode ndx, Environment env) {
-		/* ここを完成させる */
+		if (breakStmtExecute) {
+			return null;
+		}
 		if (ndx instanceof ASTCompoundStmtNode) {
 			ASTCompoundStmtNode nd = (ASTCompoundStmtNode) ndx;
 			ArrayList<ASTNode> stmts = nd.stmts;
@@ -86,9 +89,16 @@ public class Interpreter extends InterpreterBase {
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
 			while (evalExpr(nd.cond, env) != 0) {
 				ReturnValue retval = evalStmt(nd.stmt, env);
+				if (breakStmtExecute) {
+					breakStmtExecute = false;
+					break;
+				}
 				if (retval != null)
 					return retval;
 			}
+			return null;
+		} else if (ndx instanceof ASTBreakStmtNode) {
+			breakStmtExecute = true;
 			return null;
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;
@@ -104,7 +114,6 @@ public class Interpreter extends InterpreterBase {
 	}
 	
 	int evalExpr(ASTNode ndx, Environment env) {
-		/* ここを完成させる */
 		if (ndx instanceof ASTBinaryExprNode) {
 			ASTBinaryExprNode nd = (ASTBinaryExprNode) ndx;
 			int lhsValue = evalExpr(nd.lhs, env);
@@ -157,9 +166,9 @@ public class Interpreter extends InterpreterBase {
 			ASTVarRefNode nd = (ASTVarRefNode) ndx;
 			Variable var = env.lookup(nd.varName);
 			if (var == null)
-			var = globalEnv.lookup(nd.varName);
+				var = globalEnv.lookup(nd.varName);
 			if (var == null)
-			throw new Error("Undefined variable: "+nd.varName);
+				throw new Error("Undefined variable: "+nd.varName);
 			return var.get();
 		} else if (ndx instanceof ASTCallNode) {
 			ASTCallNode nd = (ASTCallNode) ndx;

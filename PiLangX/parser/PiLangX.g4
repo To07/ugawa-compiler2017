@@ -18,6 +18,7 @@ stmt: '{' stmt* '}'							# compoundStmt
 	| IDENTIFIER '=' expr ';'				# assignStmt
 	| 'if' '(' expr ')' stmt 'else' stmt	# ifStmt
 	| 'while' '(' expr ')' stmt				# whileStmt
+	| 'break' ';'								# breakStmt
 	| 'return' expr ';'						# returnStmt
 	| 'print' expr ';'						# printStmt
 	;

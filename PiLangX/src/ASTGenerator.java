@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import parser.PiLangXParser.AddExprContext;
 import parser.PiLangXParser.AndExprContext;
 import parser.PiLangXParser.AssignStmtContext;
+import parser.PiLangXParser.BreakStmtContext;
 import parser.PiLangXParser.CallExprContext;
 import parser.PiLangXParser.Cmp1ExprContext;
 import parser.PiLangXParser.Cmp2ExprContext;
@@ -86,6 +87,8 @@ public class ASTGenerator {
 			ASTNode cond = translate(ctx.expr());
 			ASTNode stmt = translate(ctx.stmt());
 			return new ASTWhileStmtNode(cond, stmt);
+		} else if (ctxx instanceof BreakStmtContext) {
+			return new ASTBreakStmtNode();
 		} else if (ctxx instanceof ReturnStmtContext) {
 			ReturnStmtContext ctx = (ReturnStmtContext) ctxx;
 			ASTNode expr = translate(ctx.expr());

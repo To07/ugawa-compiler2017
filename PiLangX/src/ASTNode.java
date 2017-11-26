@@ -106,6 +106,15 @@ class ASTWhileStmtNode extends ASTNode {
 	}
 }
 
+class ASTBreakStmtNode extends ASTNode {
+	ASTBreakStmtNode() {
+	}
+	@Override
+	public String toString() {
+		return "(BreakStmt)";
+	}
+}
+
 class ASTPrintStmtNode extends ASTNode {
 	ASTNode expr;
 	ASTPrintStmtNode(ASTNode expr) {

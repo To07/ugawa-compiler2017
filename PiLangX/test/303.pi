@@ -1,0 +1,16 @@
+function main() {
+  var x;
+  var y;
+  x = 1;
+  y = 0;
+  while (x) {
+    if (y != 10)
+      y = y + 1;
+    else {
+      x = y;
+      break;
+      x = 255;
+    }
+  }
+  return x;
+}
