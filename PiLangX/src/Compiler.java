@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -11,6 +12,7 @@ import parser.PiLangXParser;
 
 public class Compiler extends CompilerBase {
 	boolean alreadyPrintAnswer = false;
+	ArrayDeque<String> whileEndLabelStack = new ArrayDeque<String>();
 	Environment globalEnv;
 	
 	void compileFunction(ASTFunctionNode nd) {
@@ -22,7 +24,7 @@ public class Compiler extends CompilerBase {
 			LocalVariable var = new LocalVariable(name, offset);
 			env.push(var);
 		}
-		/* ここにローカル変数の追加のコードを書くこと */
+		/* ローカル変数の追加 */
 		for (int i = 0; i < nd.varDecls.size(); i++) {
 			String name = nd.varDecls.get(i);
 			int offset = -4 * (i + 3);
@@ -46,7 +48,7 @@ public class Compiler extends CompilerBase {
 			compileStmt(stmt, epilogueLabel, env);
 		emitRI("mov", REG_DST, 0);  // returnがなかったときの戻り値 0
 		emitLabel(epilogueLabel);
-		/* ここにエピローグを生成するコードを書くこと */
+		/* エピローグを生成 */
 		System.out.println("\t@ epilogue");
 		emitRRI("add", REG_SP, REG_SP, nd.varDecls.size() * 4);
 		emitPOP(REG_R1);
@@ -57,9 +59,7 @@ public class Compiler extends CompilerBase {
 	}
 	
 	void compileStmt(ASTNode ndx, String epilogueLabel, Environment env) {
-		/* ここを完成させる */
 		if (ndx instanceof ASTCompoundStmtNode) {
-			/* 複合文 */
 			ASTCompoundStmtNode nd = (ASTCompoundStmtNode) ndx;
 			String epLabel = epilogueLabel;
 			for (ASTNode stmt: nd.stmts)
@@ -95,11 +95,11 @@ public class Compiler extends CompilerBase {
 			compileStmt(nd.elseClause, epLabel, env);
 			emitLabel(endLabel);
 		} else if (ndx instanceof ASTWhileStmtNode) {
-			/* While文 */
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
 			String loopLabel = freshLabel();
 			String endLabel = freshLabel();
 			String epLabel = epilogueLabel;
+			whileEndLabelStack.addLast(endLabel);
 			emitLabel(loopLabel);
 			compileExpr(nd.cond, env);
 			emitRI("cmp", REG_DST, 0);
@@ -107,14 +107,16 @@ public class Compiler extends CompilerBase {
 			compileStmt(nd.stmt, epLabel, env);
 			emitJMP("b", loopLabel);
 			emitLabel(endLabel);
+			whileEndLabelStack.removeLast();
+		} else if (ndx instanceof ASTBreakStmtNode) {
+			/* while文のendLabelにジャンプする */
+			emitJMP("b", whileEndLabelStack.getLast());
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;
 			String epLabel = epilogueLabel;
-			/* 関数を呼ぶ */
 			compileExpr(nd.expr, env);
 			emitJMP("b", epLabel);
 		} else if (ndx instanceof ASTPrintStmtNode) {
-			/* Print文 */
 			ASTPrintStmtNode nd = (ASTPrintStmtNode) ndx;
 			compileExpr(nd.expr, env);
 			emitCALL("print_r0");
