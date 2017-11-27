@@ -1,0 +1,15 @@
+function main() {
+  var x;
+  var y;
+  x = 1;
+  while(x) {
+    y = y + 1;
+    while(x) {
+      y = y + 1;
+      break;
+    }
+    y = y + 1;
+    break;
+  }
+  return y;
+}
