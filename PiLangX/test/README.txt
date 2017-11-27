@@ -11,3 +11,4 @@
 301: ローカル変数の初期化(コンパイラ用)
 302: while-break文 その１
 303: while-break文 その２
+304: while-break文 その３
