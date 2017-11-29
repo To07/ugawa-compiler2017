@@ -34,8 +34,7 @@ public class Compiler extends CompilerBase {
 			ASTUnaryExprNode nd = (ASTUnaryExprNode) ndx;
 			compileExpr(nd.operand, env);
 			if (nd.op.equals("-")) {
-				emitRR("mvn", REG_DST, REG_DST);
-				emitRRI("add", REG_DST, REG_DST, 1);
+				emitRRI("rsb", REG_DST, REG_DST, 0);
 			} else if (nd.op.equals("~"))
 				emitRR("mvn", REG_DST, REG_DST);
 			else
