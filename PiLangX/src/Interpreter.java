@@ -17,6 +17,9 @@ public class Interpreter extends InterpreterBase {
 	}
 	
 	boolean breakStmtExecute = false;
+	boolean isInWhileStmt = false;
+	ASTWhileStmtNode firstWhileNd = null;
+	
 	Environment globalEnv;
 	ASTProgNode prog;
 	ASTFunctionNode lookupFunction(String name) {
@@ -87,6 +90,9 @@ public class Interpreter extends InterpreterBase {
 			return null;
 		} else if (ndx instanceof ASTWhileStmtNode) {
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
+			if (!isInWhileStmt)
+				firstWhileNd = nd;
+			isInWhileStmt = true;
 			while (evalExpr(nd.cond, env) != 0) {
 				ReturnValue retval = evalStmt(nd.stmt, env);
 				if (breakStmtExecute) {
@@ -96,9 +102,14 @@ public class Interpreter extends InterpreterBase {
 				if (retval != null)
 					return retval;
 			}
+			if (nd == firstWhileNd)
+				isInWhileStmt = false;
 			return null;
 		} else if (ndx instanceof ASTBreakStmtNode) {
-			breakStmtExecute = true;
+			if (isInWhileStmt)
+				breakStmtExecute = true;
+			else
+				throw new Error("Break outside while loop");
 			return null;
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;

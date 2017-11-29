@@ -110,7 +110,11 @@ public class Compiler extends CompilerBase {
 			whileEndLabelStack.removeLast();
 		} else if (ndx instanceof ASTBreakStmtNode) {
 			/* while文のendLabelにジャンプする */
-			emitJMP("b", whileEndLabelStack.getLast());
+			try{
+				emitJMP("b", whileEndLabelStack.getLast());
+			} catch(java.util.NoSuchElementException e) {
+				throw new Error("Break outside while loop");
+			}
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;
 			String epLabel = epilogueLabel;
