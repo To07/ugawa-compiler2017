@@ -17,7 +17,9 @@ public class Interpreter extends InterpreterBase {
 	}
 	
 	boolean breakStmtExecute = false;
+	boolean continueStmtExecute = false;
 	boolean isInWhileStmt = false;
+	
 	ASTWhileStmtNode firstWhileNd = null;
 	
 	Environment globalEnv;
@@ -54,7 +56,7 @@ public class Interpreter extends InterpreterBase {
 	}
 
 	ReturnValue evalStmt(ASTNode ndx, Environment env) {
-		if (breakStmtExecute) {
+		if (breakStmtExecute || continueStmtExecute) {
 			return null;
 		}
 		if (ndx instanceof ASTCompoundStmtNode) {
@@ -98,6 +100,9 @@ public class Interpreter extends InterpreterBase {
 				if (breakStmtExecute) {
 					breakStmtExecute = false;
 					break;
+				} else if (continueStmtExecute) {
+					continueStmtExecute = false;
+					continue;
 				}
 				if (retval != null)
 					return retval;
@@ -110,6 +115,12 @@ public class Interpreter extends InterpreterBase {
 				breakStmtExecute = true;
 			else
 				throw new Error("Break outside while loop");
+			return null;
+		} else if (ndx instanceof ASTContinueStmtNode) {
+			if (isInWhileStmt)
+				continueStmtExecute = true;
+			else
+				throw new Error("Continue outside while loop");
 			return null;
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;

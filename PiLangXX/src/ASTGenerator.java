@@ -11,6 +11,7 @@ import parser.PiLangXXParser.CallExprContext;
 import parser.PiLangXXParser.Cmp1ExprContext;
 import parser.PiLangXXParser.Cmp2ExprContext;
 import parser.PiLangXXParser.CompoundStmtContext;
+import parser.PiLangXXParser.ContinueStmtContext;
 import parser.PiLangXXParser.ExprContext;
 import parser.PiLangXXParser.FuncDeclContext;
 import parser.PiLangXXParser.IfStmtContext;
@@ -89,6 +90,8 @@ public class ASTGenerator {
 			return new ASTWhileStmtNode(cond, stmt);
 		} else if (ctxx instanceof BreakStmtContext) {
 			return new ASTBreakStmtNode();
+		} else if (ctxx instanceof ContinueStmtContext) {
+			return new ASTContinueStmtNode();
 		} else if (ctxx instanceof ReturnStmtContext) {
 			ReturnStmtContext ctx = (ReturnStmtContext) ctxx;
 			ASTNode expr = translate(ctx.expr());

@@ -12,6 +12,7 @@ import parser.PiLangXXParser;
 
 public class Compiler extends CompilerBase {
 	boolean alreadyPrintAnswer = false;
+	ArrayDeque<String> whileLoopLabelStack = new ArrayDeque<String>();
 	ArrayDeque<String> whileEndLabelStack = new ArrayDeque<String>();
 	Environment globalEnv;
 	
@@ -99,6 +100,7 @@ public class Compiler extends CompilerBase {
 			String loopLabel = freshLabel();
 			String endLabel = freshLabel();
 			String epLabel = epilogueLabel;
+			whileLoopLabelStack.addLast(loopLabel);
 			whileEndLabelStack.addLast(endLabel);
 			emitLabel(loopLabel);
 			compileExpr(nd.cond, env);
@@ -107,6 +109,7 @@ public class Compiler extends CompilerBase {
 			compileStmt(nd.stmt, epLabel, env);
 			emitJMP("b", loopLabel);
 			emitLabel(endLabel);
+			whileLoopLabelStack.removeLast();
 			whileEndLabelStack.removeLast();
 		} else if (ndx instanceof ASTBreakStmtNode) {
 			/* while文のendLabelにジャンプする */
@@ -114,6 +117,13 @@ public class Compiler extends CompilerBase {
 				emitJMP("b", whileEndLabelStack.getLast());
 			} catch(java.util.NoSuchElementException e) {
 				throw new Error("Break outside while loop");
+			}
+		} else if (ndx instanceof ASTContinueStmtNode) {
+			/* while文のloopLabelにジャンプする */
+			try{
+				emitJMP("b", whileLoopLabelStack.getLast());
+			} catch(java.util.NoSuchElementException e) {
+				throw new Error("Continue outside while loop");
 			}
 		} else if (ndx instanceof ASTReturnStmtNode) {
 			ASTReturnStmtNode nd = (ASTReturnStmtNode) ndx;

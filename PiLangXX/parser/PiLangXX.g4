@@ -19,6 +19,7 @@ stmt: '{' stmt* '}'							# compoundStmt
 	| 'if' '(' expr ')' stmt 'else' stmt	# ifStmt
 	| 'while' '(' expr ')' stmt				# whileStmt
 	| 'break' ';'								# breakStmt
+	| 'continue' ';'							# continueStmt
 	| 'return' expr ';'						# returnStmt
 	| 'print' expr ';'						# printStmt
 	;
