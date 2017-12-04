@@ -79,10 +79,15 @@ public class ASTGenerator {
 			return new ASTAssignStmtNode(var, expr);
 		} else if (ctxx instanceof IfStmtContext) {
 			IfStmtContext ctx = (IfStmtContext) ctxx;
-			ASTNode cond = translate(ctx.expr());
-			ASTNode thenClause = translate(ctx.stmt(0));
-			ASTNode elseClause = translate(ctx.stmt(1));
-			return new ASTIfStmtNode(cond, thenClause, elseClause);
+			ArrayList<ASTNode> exprs = new ArrayList<ASTNode>();
+			ArrayList<ASTNode> stmts = new ArrayList<ASTNode>();
+			for (ExprContext expr: ctx.expr()) {
+				exprs.add(translate(expr));
+			}
+			for (StmtContext stmt: ctx.stmt()) {
+				stmts.add(translate(stmt));
+			}
+			return new ASTIfStmtNode(exprs, stmts);
 		} else if (ctxx instanceof WhileStmtContext) {
 			WhileStmtContext ctx = (WhileStmtContext) ctxx;
 			ASTNode cond = translate(ctx.expr());

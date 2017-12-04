@@ -14,14 +14,16 @@ params:   /* no parameter */
 varDecls: ('var' IDENTIFIER ';')*
     ;
 
-stmt: '{' stmt* '}'							# compoundStmt
-	| IDENTIFIER '=' expr ';'				# assignStmt
-	| 'if' '(' expr ')' stmt 'else' stmt	# ifStmt
-	| 'while' '(' expr ')' stmt				# whileStmt
-	| 'break' ';'								# breakStmt
-	| 'continue' ';'							# continueStmt
-	| 'return' expr ';'						# returnStmt
-	| 'print' expr ';'						# printStmt
+stmt: '{' stmt* '}'					# compoundStmt
+	| IDENTIFIER '=' expr ';'		# assignStmt
+	| 'if' '(' expr ')' stmt
+	  ('else if' '(' expr ')' stmt)*
+	  ('else' stmt|)					# ifStmt
+	| 'while' '(' expr ')' stmt		# whileStmt
+	| 'break' ';'						# breakStmt
+	| 'continue' ';'					# continueStmt
+	| 'return' expr ';'				# returnStmt
+	| 'print' expr ';'				# printStmt
 	;
 
 expr: logOrExpr

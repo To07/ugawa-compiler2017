@@ -1,6 +1,9 @@
 # PiLangXX
-�ƥ����Ȳ���Ǽ������뵡ǽ�ʳ��Τ�Τϡ�����PiLangXX�Ǽ������ޤ���
+テキスト課題で実装する機能以外のものは，このPiLangXXで実装します．
 
-### ����������ǽ
-- ��;�黻��(%)
-- while-continueʸ
+### 実装した機能
+- 剰余演算子(%)
+- while-continue文
+- if文の拡張
+  - else-if
+  - elseの省略

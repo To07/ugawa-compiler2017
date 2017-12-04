@@ -5,8 +5,11 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import com.sun.javafx.css.CompoundSelector;
+
 import parser.PiLangXXLexer;
 import parser.PiLangXXParser;
+import sun.font.StrikeMetrics;
 
 public class Interpreter extends InterpreterBase {
 	static class ReturnValue {
@@ -80,12 +83,20 @@ public class Interpreter extends InterpreterBase {
 			return null;
 		} else if (ndx instanceof ASTIfStmtNode) {
 			ASTIfStmtNode nd = (ASTIfStmtNode) ndx;
-			if (evalExpr(nd.cond, env) != 0) {
-				ReturnValue retval = evalStmt(nd.thenClause, env);
-				if (retval != null)
-					return retval;
-			} else {
-				ReturnValue retval = evalStmt(nd.elseClause, env);
+			ArrayList<ASTNode> conds = nd.conds;
+			ArrayList<ASTNode> stmts = nd.stmts;
+			int condsSize = conds.size();
+			int stmtsSize = stmts.size();
+			for (int i = 0; i < condsSize; i++) {
+				if (evalExpr(conds.get(i), env) != 0) {
+					ReturnValue retval = evalStmt(stmts.get(i), env);
+					if (retval != null)
+						return retval;
+					return null;
+				}
+			}
+			if (condsSize < stmtsSize) {
+				ReturnValue retval = evalStmt(stmts.get(stmtsSize-1), env);
 				if (retval != null)
 					return retval;
 			}

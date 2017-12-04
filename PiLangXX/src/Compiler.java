@@ -84,17 +84,26 @@ public class Compiler extends CompilerBase {
 				throw new Error("Not a global variable: "+nd.var);
 		} else if (ndx instanceof ASTIfStmtNode) {
 			ASTIfStmtNode nd = (ASTIfStmtNode) ndx;
-			String elseLabel = freshLabel();
 			String endLabel = freshLabel();
 			String epLabel = epilogueLabel;
-			compileExpr(nd.cond, env);
-			emitRI("cmp", REG_DST, 0);
-			emitJMP("beq", elseLabel);
-			compileStmt(nd.thenClause, epLabel, env);
-			emitJMP("b", endLabel);
-			emitLabel(elseLabel);
-			compileStmt(nd.elseClause, epLabel, env);
+			ArrayList<ASTNode> conds = nd.conds;
+			ArrayList<ASTNode> stmts = nd.stmts;
+			int condsSize = conds.size();
+			int stmtsSize = stmts.size();
+			for (int i = 0; i < condsSize; i++) {
+				String elseLabel = freshLabel();
+				compileExpr(nd.conds.get(i), env);
+				emitRI("cmp", REG_DST, 0);
+				emitJMP("beq", elseLabel);
+				compileStmt(stmts.get(i), epLabel, env);
+				emitJMP("b", endLabel);
+				emitLabel(elseLabel);
+			}
+			if (condsSize < stmtsSize) {
+				compileStmt(stmts.get(stmtsSize-1), epLabel, env);
+			}
 			emitLabel(endLabel);
+			
 		} else if (ndx instanceof ASTWhileStmtNode) {
 			ASTWhileStmtNode nd = (ASTWhileStmtNode) ndx;
 			String loopLabel = freshLabel();

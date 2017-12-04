@@ -79,17 +79,24 @@ class ASTAssignStmtNode extends ASTNode {
 }
 
 class ASTIfStmtNode extends ASTNode {
-	ASTNode cond;
-	ASTNode thenClause;
-	ASTNode elseClause;
-	ASTIfStmtNode(ASTNode cond, ASTNode thenClause, ASTNode elseClause) {
-		this.cond = cond;
-		this.thenClause = thenClause;
-		this.elseClause = elseClause;
+	ArrayList<ASTNode> conds;
+	ArrayList<ASTNode> stmts;
+	ASTIfStmtNode(ArrayList<ASTNode> conds, ArrayList<ASTNode> stmts) {
+		this.conds = conds;
+		this.stmts = stmts;
 	}
 	@Override
 	public String toString() {
-		return "(IfStmt "+cond+"\n"+thenClause+"\n"+elseClause+")";
+		String s = "(IfStmt ("+conds.get(0)+" "+stmts.get(0)+")\n";
+		for (int i = 1; i < conds.size(); i++) {
+			s += "        (";
+			s += conds.get(i)+" ";
+			s += stmts.get(i)+")\n";
+		}
+		s += "        (";
+		s += stmts.get(stmts.size()-1);
+		s += ")\n)";
+		return s;
 	}
 }
 
