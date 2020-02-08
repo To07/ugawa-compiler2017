@@ -1,4 +1,4 @@
-# ugawa-compiler2017
+# orig-compiler2017
 ANTLR4とJavaを用いた独自言語のインタプリタ・コンパイラの実装です。
 
 TinyPi○○とPiLang○○の２種類の実装があり、それぞれTinyPiE→TinyPiS→TinyPiSX、
